@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 //User name can cause exceptions in some SQL implementations  @Entity(name = "UserInfo") can be used
+//Dev branch test change comment
 @Entity
 public class User {
     @Id
