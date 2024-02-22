@@ -11,6 +11,7 @@ import java.util.Set;
 
 //User name can cause exceptions in some SQL implementations  @Entity(name = "UserInfo") can be used
 //Dev branch test change comment
+//VSCODE DEV BRANCH COMMIT TEST
 @Entity
 public class User {
     @Id
