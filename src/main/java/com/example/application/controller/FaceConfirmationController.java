@@ -14,6 +14,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class FaceConfirmationController implements IFaceConfirmationController {
     private FaceConfirmationService faceConfirmationService;
 
+    public FaceConfirmationController(FaceConfirmationService faceConfirmationService) {
+        this.faceConfirmationService = faceConfirmationService;
+    }
+
     @Override
     @PostMapping("/confirmPhoto")
     public ResponseEntity<Object> confirmPhoto(@RequestParam("identityNumber") String identityNumber, @RequestParam("frontPhoto") MultipartFile frontPhotoFromMobile, @RequestParam("rightPhoto") MultipartFile rightPhotoFromMobile, @RequestParam("leftPhoto") MultipartFile leftPhotoFromMobile) {
