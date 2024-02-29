@@ -2,6 +2,8 @@ package com.example.application.controller;
 
 import com.example.application.data.entities.Notification;
 import com.example.application.data.entities.User;
+import com.example.application.data.entities.UserNotification;
+import com.example.application.services.NotificationService;
 import com.example.application.services.UserNotificationService;
 import com.example.application.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,10 +22,13 @@ public class NotificationController implements INotificationController {
     UserNotificationService userNotificationService;
     UserService userService;
 
-    public NotificationController(UserNotificationService userNotificationService, UserService userService) {
+    NotificationService notificationService;
+
+    public NotificationController(UserNotificationService userNotificationService, UserService userService, NotificationService notificationService) {
 
         this.userNotificationService = userNotificationService;
         this.userService = userService;
+        this.notificationService = notificationService;
 
     }
 
@@ -78,4 +83,28 @@ public class NotificationController implements INotificationController {
         User user = userService.findById(userId);
         return userNotificationService.countReadNotificationsForUser(user);
     }
+
+    @PostMapping("/setNotificationRead")
+    public ResponseEntity<String> setNotificationRead(@RequestParam("identityNumber") String userId, @RequestParam("notificationId") String notificationId) {
+        User user = userService.findById(userId);
+        Notification notification = notificationService.findById(Long.parseLong(notificationId));
+        UserNotification userNotification = userNotificationService.findById(user, notification);
+        userNotification.setStatus("read");
+        userNotificationService.saveUserNotification(userNotification);
+
+
+        return ResponseEntity.ok().body("{\"success\": true}");
+    }
+
+    @PostMapping("/getUnreadNotificationsCount")
+    public ResponseEntity<String> getUnreadNotificationsCount(@RequestParam("identityNumber") String userId) {
+        User user = userService.findById(userId);
+        long count = userNotificationService.countUnreadNotificationsForUser(user);
+        System.out.println("getUnreadNotificationsCount: " + count);
+        //return ResponseEntity.ok().body("{\"success\": true}");
+
+        return ResponseEntity.ok().body("{\"count\": " + count + "}");
+    }
+
+
 }
