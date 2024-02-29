@@ -6,11 +6,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class SmokeTest {
 
-
+    //test
     @Test
     void contextLoads() throws Exception {
 
         System.out.println("Test Runned");
-        
+
     }
 }
