@@ -1,3 +1,11 @@
+/**
+ * FaceConfirmationService is a service class responsible for confirming a user's identity
+ * by comparing the provided photos with the photos stored in the database.
+ *
+ * @author emreakburakcı
+ * @version 1.0
+ */
+
 package com.example.application.services;
 
 import com.example.application.data.entities.User;
@@ -22,16 +30,38 @@ import java.util.Random;
 
 @Service
 public class FaceConfirmationService {
+
+    // Face++ API URL and credentials
     private static final String FACE_PLUS_PLUS_API_URL = "https://api-us.faceplusplus.com/facepp/v3/compare";
     private static final String apiKey = "Ik1X9kDUd81XibNwmk9JUXL_VIifTooD";
     private static final String apiSecret = "CrhF0rhDKW6w3owGcriaoVbxCNdiCK8G";
+
+    // Confidence threshold for face comparison
     private static final double CONFIDENCE_TRESHOLD = 80.0;
     private final UserRepository userRepository;
+    private final static int CONNECT_TIME_OUT = 30000;
+    private final static int READ_OUT_TIME = 50000;
+    private static String boundaryString = getBoundary();
 
+    /**
+     * Constructs a FaceConfirmationService with the provided UserRepository.
+     *
+     * @param userRepository The repository for accessing user data.
+     */
     public FaceConfirmationService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
+
+    /**
+     * Confirms the identity of a user by comparing the provided photos with the stored photos.
+     *
+     * @param identityNumber       The identity number of the user.
+     * @param frontPhotoFromMobile The front photo uploaded by the user.
+     * @param rightPhotoFromMobile The right-side photo uploaded by the user.
+     * @param leftPhotoFromMobile  The left-side photo uploaded by the user.
+     * @return ResponseEntity indicating success or failure of identity confirmation.
+     */
     public ResponseEntity<Object> confirmPhoto(String identityNumber, MultipartFile frontPhotoFromMobile, MultipartFile rightPhotoFromMobile, MultipartFile leftPhotoFromMobile) {
 
         try {
@@ -89,6 +119,13 @@ public class FaceConfirmationService {
         }
     }
 
+    /**
+     * Compares faces using Face++ API.
+     *
+     * @param photoFromMobile Photo from mobile to compare.
+     * @param userPhoto       User photo for comparison.
+     * @return True if the faces match with confidence above the threshold, false otherwise.
+     */
     public boolean compareFaces(byte[] photoFromMobile, byte[] userPhoto) {
 
 
@@ -117,10 +154,15 @@ public class FaceConfirmationService {
         return false;
     }
 
-    private final static int CONNECT_TIME_OUT = 30000;
-    private final static int READ_OUT_TIME = 50000;
-    private static String boundaryString = getBoundary();
-
+    /**
+     * Sends a POST request to the specified URL with parameters and files.
+     *
+     * @param url     The URL to send the request to.
+     * @param map     Parameters for the request.
+     * @param fileMap Files to be included in the request.
+     * @return The response as a byte array.
+     * @throws Exception if an error occurs during the request.
+     */
     protected static byte[] post(String url, HashMap<String, String> map, HashMap<String, byte[]> fileMap) throws Exception {
         HttpURLConnection conne;
         URL url1 = new URL(url);
@@ -189,15 +231,6 @@ public class FaceConfirmationService {
         return URLEncoder.encode(value, "UTF-8");
     }
 
-    private CompareFacesRequest buildRequestObject(String mobilePhotoBase64, String userPhotoBase64) {
-        CompareFacesRequest request = new CompareFacesRequest();
-        request.setApi_key(apiKey);
-        request.setApi_secret(apiSecret);
-        request.setImage_base64_1(mobilePhotoBase64);
-        request.setImage_base64_2(userPhotoBase64);
-        return request;
-    }
-
     private static String getBoundary() {
         StringBuilder sb = new StringBuilder();
         Random random = new Random();
@@ -207,66 +240,5 @@ public class FaceConfirmationService {
         return sb.toString();
     }
 
-
-    public static byte[] getBytesFromFile(File f) {
-        if (f == null) {
-            return null;
-        }
-        try {
-            FileInputStream stream = new FileInputStream(f);
-            ByteArrayOutputStream out = new ByteArrayOutputStream(1000);
-            byte[] b = new byte[1000];
-            int n;
-            while ((n = stream.read(b)) != -1)
-                out.write(b, 0, n);
-            stream.close();
-            out.close();
-            return out.toByteArray();
-        } catch (IOException e) {
-        }
-        return null;
-    }
-
-    class CompareFacesRequest {
-        private String api_key;
-        private String api_secret;
-        private String image_base64_1;
-
-        public String getApi_key() {
-            return api_key;
-        }
-
-        public void setApi_key(String api_key) {
-            this.api_key = api_key;
-        }
-
-        public String getApi_secret() {
-            return api_secret;
-        }
-
-        public void setApi_secret(String api_secret) {
-            this.api_secret = api_secret;
-        }
-
-        public String getImage_base64_1() {
-            return image_base64_1;
-        }
-
-        public void setImage_base64_1(String image_base64_1) {
-            this.image_base64_1 = image_base64_1;
-        }
-
-        public String getImage_base64_2() {
-            return image_base64_2;
-        }
-
-        public void setImage_base64_2(String image_base64_2) {
-            this.image_base64_2 = image_base64_2;
-        }
-
-        private String image_base64_2;
-
-        // Getters and setters
-    }
 
 }

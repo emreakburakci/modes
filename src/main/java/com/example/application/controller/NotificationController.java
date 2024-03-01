@@ -101,8 +101,6 @@ public class NotificationController implements INotificationController {
         User user = userService.findById(userId);
         long count = userNotificationService.countUnreadNotificationsForUser(user);
         System.out.println("getUnreadNotificationsCount: " + count);
-        //return ResponseEntity.ok().body("{\"success\": true}");
-
         return ResponseEntity.ok().body("{\"count\": " + count + "}");
     }
 
