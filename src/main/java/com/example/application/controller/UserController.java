@@ -22,6 +22,16 @@ public class UserController implements IUserController {
 
     }
 
+    @PostMapping("/saveConfirmationInfo")
+
+    public ResponseEntity<String> saveConfirmationInfo(@RequestParam("identityNumber") String identityNumber) {
+        
+        boolean result = userService.saveConfirmationInfo(identityNumber);
+
+        return ResponseEntity.ok().body("{\"success\": " + result + "}");
+
+    }
+
     @PostMapping("/getUserNotificationsOld")
 
     public ResponseEntity<String> getUserNotifications(String identityNumber) {

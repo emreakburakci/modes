@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -100,5 +101,18 @@ public class UserService {
 
     public User findById(String identityNumber) {
         return userRepository.findById(identityNumber).get();
+    }
+
+    public boolean saveConfirmationInfo(String identityNumber) {
+        try {
+            User user = userRepository.findById(identityNumber).get();
+
+            user.setLastConfirmationStatus("OK");
+            user.setLastConfirmationDateTime(LocalDateTime.now());
+            userRepository.save(user);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 }

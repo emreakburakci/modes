@@ -8,5 +8,7 @@ public interface IUserController {
 
     public ResponseEntity<String> getUserNotifications(String identityNumber);
 
+    public ResponseEntity<String> saveConfirmationInfo(String identityNumber);
+
 
 }
