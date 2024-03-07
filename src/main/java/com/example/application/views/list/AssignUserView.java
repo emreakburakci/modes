@@ -14,7 +14,9 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.*;
 
 import java.util.ArrayList;
@@ -22,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 @Route(value = "/assignUser/:notificationId", layout = MainLayout.class)
-@PageTitle("Notifications")
+@PageTitle("Bildirim Atama")
 
 public class AssignUserView extends VerticalLayout implements HasUrlParameter<String> {
 
@@ -37,6 +39,10 @@ public class AssignUserView extends VerticalLayout implements HasUrlParameter<St
     FormLayout gridLabels;
     Notification notification;
 
+    Button assignAllButton = new Button("Hepsine Ata");
+
+    Button removeAllButton = new Button("Hepsini çıkar");
+
     //ResourceBundleUtil rb;
 
     public AssignUserView(UserService userService, NotificationService notificationService, UserNotificationService userNotificationService) {
@@ -50,31 +56,44 @@ public class AssignUserView extends VerticalLayout implements HasUrlParameter<St
         setSizeFull();
         notificationInfo = new FormLayout();
 
-        H3 related = new H3("Assigned Users");
-        H3 notRelated = new H3("Not Assigned Users");
+        H3 related = new H3("Bildirim Atanmış Kullanıcılar");
+        H3 notRelated = new H3("Bildirim Atanmamış Kullanıcılar");
 
-        gridLabels = new FormLayout(related, notRelated);
+        configureButtons();
+
+        gridLabels = new FormLayout(related, notRelated, removeAllButton, assignAllButton);
 
         add(notificationInfo, gridLabels, getContent());
+    }
+
+    private void configureButtons() {
+        removeAllButton.addClickListener(click -> {
+            unrelateAll();
+        });
+        assignAllButton.addClickListener(click -> {
+            relateAll();
+        });
     }
 
     private void configureNotificationInfo() {
 
 
-        TextField notificationId = new TextField("Notification Id");
+        TextField notificationId = new TextField("ID");
         notificationId.setValue(Long.toString(notification.getNotificationId()));
         notificationId.setReadOnly(true);
 
-        TextField title = new TextField("Title");
+        TextField title = new TextField("Başlık");
         title.setValue(notification.getTitle());
         title.setReadOnly(true);
 
-        TextField content = new TextField("Content");
+        TextArea content = new TextArea("İçerik");
         content.setValue(notification.getContent());
         content.setReadOnly(true);
 
 
         notificationInfo.add(notificationId, title, content);
+
+        notificationInfo.setColspan(content, 2);
 
 
     }
@@ -102,7 +121,15 @@ public class AssignUserView extends VerticalLayout implements HasUrlParameter<St
         notAssignedUsers.addClassNames("user-grid");
         notAssignedUsers.setSizeFull();
         notAssignedUsers.setColumns("identityNumber", "firstName", "lastName");
+
+        notAssignedUsers.getColumnByKey("identityNumber").setHeader("Kimlik Numarası");
+        notAssignedUsers.getColumnByKey("firstName").setHeader("Ad");
+        notAssignedUsers.getColumnByKey("lastName").setHeader("Soyad");
+
         notAssignedUsers.getColumns().forEach(col -> col.setAutoWidth(true));
+        notAssignedUsers.getColumns().forEach(col -> col.setAutoWidth(true));
+        notAssignedUsers.getColumns().forEach(col -> col.setAutoWidth(true));
+
 
         notAssignedUsers.addComponentColumn(user -> {
             Button button = new Button("", VaadinIcon.ARROW_LEFT.create());
@@ -114,10 +141,6 @@ public class AssignUserView extends VerticalLayout implements HasUrlParameter<St
             return button;
         });
 
-        notAssignedUsers.getColumnByKey("identityNumber").setHeader("identityNumber");
-        notAssignedUsers.getColumnByKey("firstName").setHeader("firstName");
-        notAssignedUsers.getColumnByKey("lastName").setHeader("lastName");
-
 
         notAssignedUsers.asSingleSelect().addValueChangeListener(event -> {
         });
@@ -128,6 +151,8 @@ public class AssignUserView extends VerticalLayout implements HasUrlParameter<St
         assignedUsers.addClassNames("user-grid");
         assignedUsers.setSizeFull();
         assignedUsers.setColumns("identityNumber", "firstName", "lastName");
+        assignedUsers.addColumn(user -> user.getNotificationStatus(Long.toString(notification.getNotificationId()))).setHeader("Durum");
+
         assignedUsers.getColumns().forEach(col -> col.setAutoWidth(true));
 
         assignedUsers.addComponentColumn(user -> {
@@ -139,10 +164,9 @@ public class AssignUserView extends VerticalLayout implements HasUrlParameter<St
             return button;
         });
 
-        assignedUsers.getColumnByKey("identityNumber").setHeader("identityNumber");
-        assignedUsers.getColumnByKey("firstName").setHeader("firstName");
-        assignedUsers.getColumnByKey("lastName").setHeader("lastName");
-
+        assignedUsers.getColumnByKey("identityNumber").setHeader("Kimlik Numarası");
+        assignedUsers.getColumnByKey("firstName").setHeader("Ad");
+        assignedUsers.getColumnByKey("lastName").setHeader("Soyad");
 
         assignedUsers.asSingleSelect().addValueChangeListener(event -> {
         });
@@ -153,14 +177,8 @@ public class AssignUserView extends VerticalLayout implements HasUrlParameter<St
         //user.getNotifications().remove(notification);
         UserNotification userNotification = userNotificationService.findById(user, notification);
 
-
         user.getUserNotifications().remove(userNotification);
         userNotificationService.delete(userNotification);
-
-        //user = userService.saveAndFlush(user);
-        //notification = notificationService.findById(notification.getNotificationId());
-        //user = userService.findById(user.getIdentityNumber());
-
 
         updateAssignedUserGrid();
         updateNotAssignedUserGrid();
@@ -171,6 +189,36 @@ public class AssignUserView extends VerticalLayout implements HasUrlParameter<St
 
     }
 
+
+    private void unrelateAll() {
+        System.out.println("UNRELATE ALL RUNNED");
+        ListDataProvider<User> dataProvider = (ListDataProvider<User>) assignedUsers.getDataProvider();
+
+        List<User> allUsers = new ArrayList(dataProvider.getItems());
+
+        List<UserNotification> notificationsToRemove = new ArrayList<>();
+
+        for (User user : allUsers) {
+
+            UserNotification userNotification = new UserNotification(user, notification);
+
+            user.getUserNotifications().remove(userNotification);
+
+            notificationsToRemove.add(userNotification);
+
+        }
+
+        userNotificationService.deleteAll(notificationsToRemove);
+
+        updateAssignedUserGrid();
+        updateNotAssignedUserGrid();
+
+        UI.getCurrent().getPage().reload();
+
+        System.out.println("UNRELATE ALL FINISHED");
+
+    }
+
     private void relate(User user) {
         System.out.println("RELATE RUNNED");
         UserNotification userNotification = new UserNotification(user, notification);
@@ -178,6 +226,33 @@ public class AssignUserView extends VerticalLayout implements HasUrlParameter<St
         user.getUserNotifications().add(userNotification);
 
         userNotificationService.saveUserNotification(userNotification);
+
+        updateAssignedUserGrid();
+        updateNotAssignedUserGrid();
+        UI.getCurrent().getPage().reload();
+        System.out.println("RELATE FINISHED");
+
+    }
+
+    private void relateAll() {
+        System.out.println("RELATE ALL RUNNED");
+        ListDataProvider<User> dataProvider = (ListDataProvider<User>) notAssignedUsers.getDataProvider();
+
+        List<User> allUsers = new ArrayList(dataProvider.getItems());// users in the notAssignedUsers
+
+        List<UserNotification> notificationsToSave = new ArrayList<>();
+
+        for (User user : allUsers) {
+
+            UserNotification userNotification = new UserNotification(user, notification);
+
+            user.getUserNotifications().add(userNotification);
+
+            notificationsToSave.add(userNotification);
+
+        }
+
+        userNotificationService.saveUserNotifications(notificationsToSave);
 
         updateAssignedUserGrid();
         updateNotAssignedUserGrid();

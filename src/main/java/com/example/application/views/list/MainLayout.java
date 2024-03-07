@@ -17,7 +17,7 @@ public class MainLayout extends AppLayout {
     }
 
     private void createHeader() {
-        H1 logo = new H1("Vaadin CRM");
+        H1 logo = new H1("Adli Kontrol Sistemi Yönetici Paneli");
         logo.addClassNames(
                 LumoUtility.FontSize.LARGE,
                 LumoUtility.Margin.MEDIUM);
@@ -36,10 +36,10 @@ public class MainLayout extends AppLayout {
 
     private void createDrawer() {
         addToDrawer(new VerticalLayout(
-                new RouterLink("List", ListView.class),
-                new RouterLink("Dashboard", DashboardView.class),
-                new RouterLink("Notifications", NotificationView.class)
-                
+                new RouterLink("Kullanıcılar", ListView.class),
+                //new RouterLink("Dashboard", DashboardView.class),
+                new RouterLink("Bildirim Ekranı", NotificationView.class)
+
         ));
     }
 }

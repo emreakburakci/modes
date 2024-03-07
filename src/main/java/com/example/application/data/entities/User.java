@@ -206,6 +206,13 @@ public class User {
         this.userNotifications = userNotifications;
     }
 
+    public String getNotificationStatus(String notificationId) {
+        UserNotification userNotification = getUserNotifications().stream().filter(un -> Long.toString(un.getUserNotificationId().getNotificationId()).equals(notificationId)).toList().get(0);
+
+        return userNotification.getStatus();
+
+    }
+
     @Override
     public String toString() {
         return firstName + " " + lastName;

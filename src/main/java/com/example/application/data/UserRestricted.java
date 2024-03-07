@@ -14,6 +14,8 @@ public class UserRestricted {
     private String postalCode;
     private String phoneNumber;
 
+    private byte[] pictureFront;
+
     public UserRestricted(User user) {
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
@@ -24,6 +26,7 @@ public class UserRestricted {
         this.district = user.getDistrict();
         this.phoneNumber = user.getPhoneNumber();
         this.postalCode = user.getPostalCode();
+        this.pictureFront = user.getPictureFront();
     }
 
     public String getFirstName() {
@@ -96,5 +99,13 @@ public class UserRestricted {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public byte[] getPictureFront() {
+        return pictureFront;
+    }
+
+    public void setPictureFront(byte[] pictureFront) {
+        this.pictureFront = pictureFront;
     }
 }

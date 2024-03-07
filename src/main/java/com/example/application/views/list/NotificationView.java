@@ -19,7 +19,7 @@ import java.util.Map;
 
 
 @Route(value = "/notifications", layout = MainLayout.class)
-@PageTitle("Notifications")
+@PageTitle("Bildirimler")
 public class NotificationView extends VerticalLayout {
     Grid<Notification> grid = new Grid<>(Notification.class);
     TextField filterText = new TextField();
@@ -80,6 +80,12 @@ public class NotificationView extends VerticalLayout {
         grid.setColumns("notificationId", "title"
                 , "content");
 
+        grid.getColumnByKey("notificationId").setHeader("ID");
+        grid.getColumnByKey("title").setHeader("Başlık");
+
+        grid.getColumnByKey("content").setHeader("İçerik");
+
+
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
 
         grid.asSingleSelect().addValueChangeListener(event -> {
@@ -95,16 +101,16 @@ public class NotificationView extends VerticalLayout {
     }
 
     private HorizontalLayout getToolbar() {
-        filterText.setPlaceholder("Filter by name...");
+        filterText.setPlaceholder("Başlığa Göre Filtrele...");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
-        Button addNotificationButton = new Button("Add notification");
+        Button addNotificationButton = new Button("Bildirim Ekle");
         addNotificationButton.addClickListener(click -> addNotification());
 
         //assignUserButton = new Button("Assign User");
         //assignUserButton.addClickListener(click -> assignUser());
-        assignUserButton = new Button("Assign", event -> UI.getCurrent().navigate(AssignUserView.class, new RouteParameters("notificationId", Long.toString(selectedNotification.getNotificationId()))));
+        assignUserButton = new Button("Bildirim Ata", event -> UI.getCurrent().navigate(AssignUserView.class, new RouteParameters("notificationId", Long.toString(selectedNotification.getNotificationId()))));
         assignUserButton.setEnabled(false);
         var toolbar = new HorizontalLayout(filterText, addNotificationButton, assignUserButton);
         toolbar.addClassName("toolbar");

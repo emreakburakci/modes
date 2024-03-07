@@ -35,6 +35,7 @@ public class NotificationController implements INotificationController {
     @Override
     @PostMapping("/getUnreadUserNotifications")
     public ResponseEntity<String> findUnreadNotificationsForUser(@RequestParam("identityNumber") String userId) {
+
         User user = userService.findById(userId);
         List<Notification> notifications = userNotificationService.findUnreadNotificationsForUser(user);
         String json = "";
@@ -98,6 +99,7 @@ public class NotificationController implements INotificationController {
 
     @PostMapping("/getUnreadNotificationsCount")
     public ResponseEntity<String> getUnreadNotificationsCount(@RequestParam("identityNumber") String userId) {
+        System.out.println("getUnreadNotificationsCount Runned");
         User user = userService.findById(userId);
         long count = userNotificationService.countUnreadNotificationsForUser(user);
         System.out.println("getUnreadNotificationsCount: " + count);

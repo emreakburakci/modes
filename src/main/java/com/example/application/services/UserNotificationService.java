@@ -70,4 +70,13 @@ public class UserNotificationService {
     public long countReadNotificationsForUser(User user) {
         return userNotificationRepository.countReadNotificationsForUser(user);
     }
+
+    public void saveUserNotifications(List<UserNotification> notificationsToSave) {
+
+        userNotificationRepository.saveAll(notificationsToSave);
+    }
+
+    public void deleteAll(List<UserNotification> notificationsToRemove) {
+        userNotificationRepository.deleteAll(notificationsToRemove);
+    }
 }

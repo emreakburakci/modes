@@ -17,7 +17,6 @@ import com.vaadin.flow.shared.Registration;
 public class NotificationForm extends FormLayout {
     TextField title = new TextField("title");
     TextField content = new TextField("content");
-    TextField status = new TextField("status");
 
 
     Button save = new Button("Save");
@@ -31,7 +30,7 @@ public class NotificationForm extends FormLayout {
         addClassName("notification-form");
         binder.bindInstanceFields(this);
 
-        add(title, content, status, createButtonsLayout());
+        add(title, content, createButtonsLayout());
 
     }
 

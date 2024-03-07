@@ -22,7 +22,7 @@ import com.vaadin.flow.server.StreamResource;
 import java.io.ByteArrayInputStream;
 
 @Route(value = "", layout = MainLayout.class)
-@PageTitle("Users")
+@PageTitle("Kullanıcılar")
 public class ListView extends VerticalLayout {
     Grid<User> grid = new Grid<>(User.class);
     TextField filterText = new TextField();
@@ -35,7 +35,7 @@ public class ListView extends VerticalLayout {
         this.service = service;
         this.notificationService = notificationService;
         this.userNotificationService = userNotificationService;
-        
+
         addClassName("list-view");
         setSizeFull();
         configureGrid();
@@ -88,6 +88,22 @@ public class ListView extends VerticalLayout {
 
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
 
+        grid.getColumnByKey("identityNumber").setHeader("Kimlik Numarası");
+        grid.getColumnByKey("firstName").setHeader("İsim");
+        grid.getColumnByKey("lastName").setHeader("Soyisim");
+        grid.getColumnByKey("password").setHeader("Parola");
+        grid.getColumnByKey("email").setHeader("E-Posta");
+        grid.getColumnByKey("country").setHeader("Ülke");
+        grid.getColumnByKey("region").setHeader("Şehir");
+        grid.getColumnByKey("subregion").setHeader("İlçe");
+        grid.getColumnByKey("district").setHeader("Mahalle");
+        grid.getColumnByKey("postalCode").setHeader("Posta Kodu");
+        grid.getColumnByKey("lastConfirmationDateTime").setHeader("Son Doğrulama Zamanı");
+        grid.getColumnByKey("lastConfirmationStatus").setHeader("Son Doğrulama Durumu");
+        grid.getColumnByKey("GSMConfirmationCode").setHeader("SMS Doğrulama Kodu");
+        grid.getColumnByKey("phoneNumber").setHeader("Telefon Numarası");
+
+
         Grid.Column front = grid.addComponentColumn(user -> {
             if (user.getPictureFront() != null && user.getPictureFront().length > 0) {
                 // Create a stream resource for the user's photo
@@ -106,7 +122,7 @@ public class ListView extends VerticalLayout {
                 // If user has no photo, display a placeholder icon
                 return new Icon(VaadinIcon.USER);
             }
-        }).setHeader("Front Photo");
+        }).setHeader("Ön Fotoğraf");
 
         Grid.Column right = grid.addComponentColumn(user -> {
             if (user.getPictureRight() != null && user.getPictureRight().length > 0) {
@@ -126,7 +142,7 @@ public class ListView extends VerticalLayout {
                 // If user has no photo, display a placeholder icon
                 return new Icon(VaadinIcon.USER);
             }
-        }).setHeader("Right Photo");
+        }).setHeader("Sağ Profil");
 
         Grid.Column left = grid.addComponentColumn(user -> {
             if (user.getPictureLeft() != null && user.getPictureLeft().length > 0) {
@@ -146,21 +162,21 @@ public class ListView extends VerticalLayout {
                 // If user has no photo, display a placeholder icon
                 return new Icon(VaadinIcon.USER);
             }
-        }).setHeader("Left Photo");
+        }).setHeader("Sol Profil");
 
         grid.setColumnOrder(front, left, right, grid.getColumnByKey("identityNumber"), grid.getColumnByKey("firstName"), grid.getColumnByKey("lastName")
                 , grid.getColumnByKey("password"), grid.getColumnByKey("email"), grid.getColumnByKey("country"), grid.getColumnByKey("region"), grid.getColumnByKey("subregion"), grid.getColumnByKey("district"), grid.getColumnByKey("postalCode"), grid.getColumnByKey("lastConfirmationDateTime")
                 , grid.getColumnByKey("lastConfirmationStatus"), grid.getColumnByKey("GSMConfirmationCode"), grid.getColumnByKey("phoneNumber"));
         grid.asSingleSelect().addValueChangeListener(event ->
-                editUser(event.getValue()));
+                editUser(event.getValue(), false));
     }
 
     private HorizontalLayout getToolbar() {
-        filterText.setPlaceholder("Filter by name...");
+        filterText.setPlaceholder("İsme göre filtrele");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
-        Button addUserButton = new Button("Add user");
+        Button addUserButton = new Button("Kullanıcı Ekle");
         addUserButton.addClickListener(click -> addUser());
 
         var toolbar = new HorizontalLayout(filterText, addUserButton);
@@ -168,12 +184,16 @@ public class ListView extends VerticalLayout {
         return toolbar;
     }
 
-    public void editUser(User user) {
+    public void editUser(User user, boolean isAddUser) {
+
+        System.out.println("IS ADD USER:" + isAddUser);
         if (user == null) {
             closeEditor();
         } else {
             form.setUser(user);
             form.setVisible(true);
+            form.setIsAddUserClicked(isAddUser);
+
             addClassName("editing");
         }
     }
@@ -186,7 +206,7 @@ public class ListView extends VerticalLayout {
 
     private void addUser() {
         grid.asSingleSelect().clear();
-        editUser(new User());
+        editUser(new User(), true);
     }
 
     private void updateList() {

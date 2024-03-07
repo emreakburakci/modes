@@ -22,20 +22,20 @@ import java.io.IOException;
 
 
 public class UserForm extends FormLayout {
-    TextField identityNumber = new TextField("Identity Number");
-    TextField firstName = new TextField("First name");
-    TextField lastName = new TextField("Last name");
-    TextField password = new TextField("Password");
-    EmailField email = new EmailField("Email");
-    TextField country = new TextField("Country");
-    TextField region = new TextField("Region");
-    TextField subregion = new TextField("Subregion");
-    TextField district = new TextField("District");
-    TextField postalCode = new TextField("Postal Code");
-    TextField phoneNumber = new TextField("Phone Number");
-    Button save = new Button("Save");
-    Button delete = new Button("Delete");
-    Button close = new Button("Cancel");
+    TextField identityNumber = new TextField("Kimlik Numarası");
+    TextField firstName = new TextField("İsim");
+    TextField lastName = new TextField("Soyisim");
+    TextField password = new TextField("Parola");
+    EmailField email = new EmailField("E-Posta");
+    TextField country = new TextField("Ülke");
+    TextField region = new TextField("Şehir");
+    TextField subregion = new TextField("İlçe");
+    TextField district = new TextField("Mahalle");
+    TextField postalCode = new TextField("Posta Kodu");
+    TextField phoneNumber = new TextField("Telefon Numarası");
+    Button save = new Button("Kaydet");
+    Button delete = new Button("Sil");
+    Button close = new Button("İptal");
     MemoryBuffer bufferFront = new MemoryBuffer();
     MemoryBuffer bufferLeft = new MemoryBuffer();
 
@@ -49,6 +49,7 @@ public class UserForm extends FormLayout {
 
 
     BeanValidationBinder<User> binder = new BeanValidationBinder<>(User.class);
+    private boolean isAddUserClicked;
 
     public UserForm() {
         addClassName("user-form");
@@ -64,7 +65,8 @@ public class UserForm extends FormLayout {
 
         uploadFront.setAcceptedFileTypes("image/jpeg", "image/png", "image/gif");
         uploadFront.setMaxFiles(1);
-        uploadFront.setDropLabel(new Div("Front Photo"));
+        uploadFront.setUploadButton(new Button("Ön Fotoğraf Yükle"));
+        uploadFront.setDropLabel(new Div("Ön Fotoğraf"));
         uploadFront.addSucceededListener(event -> {
             byte[] fileContent = new byte[0];
             try {
@@ -77,7 +79,9 @@ public class UserForm extends FormLayout {
 
         uploadRight.setAcceptedFileTypes("image/jpeg", "image/png", "image/gif");
         uploadRight.setMaxFiles(1);
-        uploadRight.setDropLabel(new Div("Right Photo"));
+        uploadRight.setDropLabel(new Div("Sağ Fotoğraf"));
+        uploadRight.setUploadButton(new Button("Sağ Fotoğraf Yükle"));
+
 
         uploadRight.addSucceededListener(event -> {
             byte[] fileContent = new byte[0];
@@ -91,7 +95,9 @@ public class UserForm extends FormLayout {
 
         uploadLeft.setAcceptedFileTypes("image/jpeg", "image/png", "image/gif");
         uploadLeft.setMaxFiles(1);
-        uploadLeft.setDropLabel(new Div("Left Photo"));
+        uploadLeft.setDropLabel(new Div("Sol Fotoğraf"));
+        uploadLeft.setUploadButton(new Button("Sol Fotoğraf Yükle"));
+
 
         uploadLeft.addSucceededListener(event -> {
             byte[] fileContent = new byte[0];
@@ -109,7 +115,7 @@ public class UserForm extends FormLayout {
 
         binder.setBean(user);
 
-        
+
     }
 
     private Component createButtonsLayout() {
@@ -131,11 +137,18 @@ public class UserForm extends FormLayout {
     private void validateAndSave() {
         if (binder.isValid()) {
             User user = binder.getBean();
-            user.setPassword(MD5Utils.generateMD5(password.getValue()));
-            //user.setPassword(MD5Utils.encrypt(password.getValue()));
+            if (isAddUserClicked) {
+                user.setPassword(MD5Utils.generateMD5(password.getValue()));
+                //user.setPassword(MD5Utils.encrypt(password.getValue()));
+            }
+
 
             fireEvent(new SaveEvent(this, user));
         }
+    }
+
+    public void setIsAddUserClicked(boolean b) {
+        this.isAddUserClicked = b;
     }
 
 
